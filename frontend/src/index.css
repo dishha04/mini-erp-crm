@@ -86,6 +86,7 @@ input:focus, select:focus, textarea:focus {
 
 .form-row {
   display: flex;
+  flex-direction: row;
   gap: var(--space-md);
   align-items: center;
 }
