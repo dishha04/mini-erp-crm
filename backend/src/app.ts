@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes';
 import customerRoutes from './routes/customer.routes';
+import productRoutes from './routes/product.routes';
 
 const app = express();
 
@@ -12,6 +13,7 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/customers', customerRoutes);
+app.use('/products', productRoutes);
 
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
