@@ -5,6 +5,8 @@ import client from '../api/client';
 export default function CustomersPage() {
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('');
+  const [typeFilter, setTypeFilter] = useState('');
   const [error, setError] = useState('');
 
   // Add form
@@ -21,7 +23,7 @@ export default function CustomersPage() {
 
   const fetchCustomers = async () => {
     try {
-      const res = await client.get(`/customers?search=${search}`);
+      const res = await client.get(`/customers?search=${search}&status=${statusFilter}&customerType=${typeFilter}`);
       setCustomers(res.data.data);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch customers');
@@ -30,7 +32,7 @@ export default function CustomersPage() {
 
   useEffect(() => {
     fetchCustomers();
-  }, [search]);
+  }, [search, statusFilter, typeFilter]);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,8 +125,20 @@ export default function CustomersPage() {
       </div>
 
       <div className="card">
-        <div className="mb-3" style={{ maxWidth: '300px' }}>
-          <input type="text" placeholder="Search customers..." value={search} onChange={e => setSearch(e.target.value)} />
+        <div className="mb-3 flex gap-2" style={{ maxWidth: '600px' }}>
+          <input type="text" placeholder="Search customers..." value={search} onChange={e => setSearch(e.target.value)} style={{ flex: 1 }} />
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ width: '150px' }}>
+            <option value="">All Statuses</option>
+            <option value="LEAD">LEAD</option>
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+          </select>
+          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} style={{ width: '150px' }}>
+            <option value="">All Types</option>
+            <option value="RETAIL">RETAIL</option>
+            <option value="WHOLESALE">WHOLESALE</option>
+            <option value="DISTRIBUTOR">DISTRIBUTOR</option>
+          </select>
         </div>
 
       <table>

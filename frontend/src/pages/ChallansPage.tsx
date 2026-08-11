@@ -5,6 +5,7 @@ import client from '../api/client';
 export default function ChallansPage() {
   const [challans, setChallans] = useState([]);
   const [statusFilter, setStatusFilter] = useState('');
+  const [customerFilter, setCustomerFilter] = useState('');
   const [error, setError] = useState('');
 
   // Add Challan form
@@ -16,7 +17,7 @@ export default function ChallansPage() {
 
   const fetchChallans = async () => {
     try {
-      const res = await client.get(`/challans?status=${statusFilter}`);
+      const res = await client.get(`/challans?status=${statusFilter}&customerId=${customerFilter}`);
       setChallans(res.data.data);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch challans');
@@ -38,7 +39,7 @@ export default function ChallansPage() {
 
   useEffect(() => {
     fetchChallans();
-  }, [statusFilter]);
+  }, [statusFilter, customerFilter]);
 
   useEffect(() => {
     fetchDependencies();
@@ -122,12 +123,18 @@ export default function ChallansPage() {
       </div>
 
       <div className="card">
-        <div className="mb-3" style={{ maxWidth: '300px' }}>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+        <div className="mb-3 flex gap-2" style={{ maxWidth: '600px' }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ width: '150px' }}>
             <option value="">All Statuses</option>
             <option value="DRAFT">DRAFT</option>
             <option value="CONFIRMED">CONFIRMED</option>
             <option value="CANCELLED">CANCELLED</option>
+          </select>
+          <select value={customerFilter} onChange={e => setCustomerFilter(e.target.value)} style={{ flex: 1 }}>
+            <option value="">All Customers</option>
+            {customers.map((c: any) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
           </select>
         </div>
 

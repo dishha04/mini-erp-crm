@@ -5,6 +5,8 @@ import client from '../api/client';
 export default function ProductsPage() {
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [lowStockFilter, setLowStockFilter] = useState(false);
   const [error, setError] = useState('');
 
   // Add Product form
@@ -24,7 +26,7 @@ export default function ProductsPage() {
 
   const fetchProducts = async () => {
     try {
-      const res = await client.get(`/products?search=${search}`);
+      const res = await client.get(`/products?search=${search}&category=${categoryFilter}&lowStock=${lowStockFilter}`);
       setProducts(res.data.data);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch products');
@@ -33,7 +35,7 @@ export default function ProductsPage() {
 
   useEffect(() => {
     fetchProducts();
-  }, [search]);
+  }, [search, categoryFilter, lowStockFilter]);
 
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,8 +111,13 @@ export default function ProductsPage() {
       </div>
 
       <div className="card">
-        <div className="mb-3" style={{ maxWidth: '300px' }}>
-          <input type="text" placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
+        <div className="mb-3 flex gap-2" style={{ maxWidth: '600px', alignItems: 'center' }}>
+          <input type="text" placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} style={{ flex: 1 }} />
+          <input type="text" placeholder="Category" value={categoryFilter} onChange={e => setCategoryFilter(e.target.value)} style={{ width: '150px' }} />
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
+            <input type="checkbox" checked={lowStockFilter} onChange={e => setLowStockFilter(e.target.checked)} />
+            Low Stock Only
+          </label>
         </div>
 
       <table>
