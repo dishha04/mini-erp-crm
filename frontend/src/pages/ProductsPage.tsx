@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import client from '../api/client';
 
 export default function ProductsPage() {
@@ -140,27 +141,30 @@ export default function ProductsPage() {
                 </td>
                 <td>{p.minStockAlert}</td>
                 <td>
-                  {movementProductId === p.id ? (
-                    <form onSubmit={(e) => handleStockMovement(e, p.id)} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
-                      {movementError && <span style={{ color: 'var(--color-danger)', fontSize: '12px' }}>{movementError}</span>}
-                      <select value={movementType} onChange={e => setMovementType(e.target.value)} style={{ width: '80px', padding: '0.25rem' }}>
-                        <option value="IN">IN</option>
-                        <option value="OUT">OUT</option>
-                      </select>
-                      <input type="number" placeholder="Qty" value={movementQty} onChange={e => setMovementQty(e.target.value)} required min="1" style={{ width: '70px', padding: '0.25rem' }} />
-                      <input placeholder="Reason" value={movementReason} onChange={e => setMovementReason(e.target.value)} style={{ width: '150px', padding: '0.25rem' }} />
-                      <button type="submit" className="primary" style={{ padding: '0.25rem 0.5rem' }}>Save</button>
-                      <button type="button" className="secondary" style={{ padding: '0.25rem 0.5rem' }} onClick={() => { setMovementProductId(null); setMovementError(''); }}>Cancel</button>
-                    </form>
-                  ) : (
-                    <button className="secondary" onClick={() => { 
-                      setMovementProductId(p.id); 
-                      setMovementQty(''); 
-                      setMovementReason(''); 
-                      setMovementType('IN'); 
-                      setMovementError(''); 
-                    }}>Record Movement</button>
-                  )}
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                    <Link to={`/products/${p.id}`} style={{ fontWeight: 500 }}>View / Edit</Link>
+                    {movementProductId === p.id ? (
+                      <form onSubmit={(e) => handleStockMovement(e, p.id)} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
+                        {movementError && <span style={{ color: 'var(--color-danger)', fontSize: '12px' }}>{movementError}</span>}
+                        <select value={movementType} onChange={e => setMovementType(e.target.value)} style={{ width: '80px', padding: '0.25rem' }}>
+                          <option value="IN">IN</option>
+                          <option value="OUT">OUT</option>
+                        </select>
+                        <input type="number" placeholder="Qty" value={movementQty} onChange={e => setMovementQty(e.target.value)} required min="1" style={{ width: '70px', padding: '0.25rem' }} />
+                        <input placeholder="Reason" value={movementReason} onChange={e => setMovementReason(e.target.value)} style={{ width: '150px', padding: '0.25rem' }} />
+                        <button type="submit" className="primary" style={{ padding: '0.25rem 0.5rem' }}>Save</button>
+                        <button type="button" className="secondary" style={{ padding: '0.25rem 0.5rem' }} onClick={() => { setMovementProductId(null); setMovementError(''); }}>Cancel</button>
+                      </form>
+                    ) : (
+                      <button className="secondary" onClick={() => { 
+                        setMovementProductId(p.id); 
+                        setMovementQty(''); 
+                        setMovementReason(''); 
+                        setMovementType('IN'); 
+                        setMovementError(''); 
+                      }}>Record Movement</button>
+                    )}
+                  </div>
                 </td>
               </tr>
             );
