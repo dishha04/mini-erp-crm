@@ -12,6 +12,12 @@ export default function CustomersPage() {
   const [mobile, setMobile] = useState('');
   const [businessName, setBusinessName] = useState('');
   const [customerType, setCustomerType] = useState('RETAIL');
+  const [email, setEmail] = useState('');
+  const [gstNumber, setGstNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [status, setStatus] = useState('LEAD');
+  const [followUpDate, setFollowUpDate] = useState('');
+  const [notes, setNotes] = useState('');
 
   const fetchCustomers = async () => {
     try {
@@ -29,10 +35,22 @@ export default function CustomersPage() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await client.post('/customers', { name, mobile, businessName, customerType });
+      await client.post('/customers', { 
+        name, mobile, businessName, customerType, 
+        email, gstNumber, address, status, 
+        followUpDate: followUpDate ? new Date(followUpDate).toISOString() : undefined, 
+        notes 
+      });
       setName('');
       setMobile('');
       setBusinessName('');
+      setCustomerType('RETAIL');
+      setEmail('');
+      setGstNumber('');
+      setAddress('');
+      setStatus('LEAD');
+      setFollowUpDate('');
+      setNotes('');
       fetchCustomers();
     } catch (err: any) {
       alert(err.response?.data?.error || 'Failed to add customer');
@@ -51,24 +69,52 @@ export default function CustomersPage() {
         <form onSubmit={handleAdd} className="form-row" style={{ flexWrap: 'wrap' }}>
           <h3 style={{ width: '100%', marginBottom: 'var(--space-sm)' }}>Add Customer</h3>
           <div className="form-group" style={{ flex: '1 1 200px' }}>
-            <label>Name</label>
+            <label>Name <span style={{color: 'red'}}>*</span></label>
             <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
           </div>
           <div className="form-group" style={{ flex: '1 1 200px' }}>
-            <label>Mobile</label>
+            <label>Mobile <span style={{color: 'red'}}>*</span></label>
             <input placeholder="Mobile" value={mobile} onChange={e => setMobile(e.target.value)} required />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label>Email</label>
+            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} />
           </div>
           <div className="form-group" style={{ flex: '1 1 200px' }}>
             <label>Business Name</label>
             <input placeholder="Business Name" value={businessName} onChange={e => setBusinessName(e.target.value)} />
           </div>
           <div className="form-group" style={{ flex: '1 1 200px' }}>
-            <label>Type</label>
-            <select value={customerType} onChange={e => setCustomerType(e.target.value)}>
+            <label>GST Number</label>
+            <input placeholder="GST Number" value={gstNumber} onChange={e => setGstNumber(e.target.value)} />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label>Type <span style={{color: 'red'}}>*</span></label>
+            <select value={customerType} onChange={e => setCustomerType(e.target.value)} required>
               <option value="RETAIL">RETAIL</option>
               <option value="WHOLESALE">WHOLESALE</option>
               <option value="DISTRIBUTOR">DISTRIBUTOR</option>
             </select>
+          </div>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label>Status</label>
+            <select value={status} onChange={e => setStatus(e.target.value)}>
+              <option value="LEAD">LEAD</option>
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="INACTIVE">INACTIVE</option>
+            </select>
+          </div>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label>Follow Up Date</label>
+            <input type="date" value={followUpDate} onChange={e => setFollowUpDate(e.target.value)} />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 100%' }}>
+            <label>Address</label>
+            <input placeholder="Address" value={address} onChange={e => setAddress(e.target.value)} />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 100%' }}>
+            <label>Notes</label>
+            <textarea placeholder="Notes" value={notes} onChange={e => setNotes(e.target.value)} rows={3} />
           </div>
           <div className="form-group" style={{ flex: '1 1 100%', alignItems: 'flex-start' }}>
             <button type="submit" className="primary">Add Customer</button>

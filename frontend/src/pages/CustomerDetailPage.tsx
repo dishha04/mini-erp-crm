@@ -44,9 +44,11 @@ export default function CustomerDetailPage() {
       {!editMode ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
           <p><strong>Mobile:</strong> {customer.mobile}</p>
-          <p><strong>Email:</strong> {customer.email}</p>
-          <p><strong>Business Name:</strong> {customer.businessName}</p>
+          <p><strong>Email:</strong> {customer.email || 'N/A'}</p>
+          <p><strong>Business Name:</strong> {customer.businessName || 'N/A'}</p>
+          <p><strong>GST Number:</strong> {customer.gstNumber || 'N/A'}</p>
           <p><strong>Type:</strong> {customer.customerType}</p>
+          <p><strong>Address:</strong> {customer.address || 'N/A'}</p>
           <p>
             <strong>Status:</strong>{' '}
             <span className={`badge ${customer.status === 'ACTIVE' ? 'green' : customer.status === 'INACTIVE' ? 'gray' : 'amber'}`}>
@@ -78,6 +80,10 @@ export default function CustomerDetailPage() {
             <input value={formData.businessName || ''} onChange={e => setFormData({...formData, businessName: e.target.value})} placeholder="Business Name" />
           </div>
           <div className="form-group">
+            <label>GST Number</label>
+            <input value={formData.gstNumber || ''} onChange={e => setFormData({...formData, gstNumber: e.target.value})} placeholder="GST Number" />
+          </div>
+          <div className="form-group">
             <label>Type</label>
             <select value={formData.customerType || 'RETAIL'} onChange={e => setFormData({...formData, customerType: e.target.value})}>
               <option value="RETAIL">RETAIL</option>
@@ -96,6 +102,10 @@ export default function CustomerDetailPage() {
           <div className="form-group">
             <label>Follow Up Date</label>
             <input type="date" value={formData.followUpDate ? formData.followUpDate.split('T')[0] : ''} onChange={e => setFormData({...formData, followUpDate: e.target.value ? new Date(e.target.value).toISOString() : null})} />
+          </div>
+          <div className="form-group">
+            <label>Address</label>
+            <textarea value={formData.address || ''} onChange={e => setFormData({...formData, address: e.target.value})} placeholder="Address" rows={2} />
           </div>
           <div className="form-group">
             <label>Notes</label>
