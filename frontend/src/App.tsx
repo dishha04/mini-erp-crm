@@ -1,30 +1,34 @@
-import { useEffect, useState } from 'react';
-import client from './api/client';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import Layout from './components/Layout';
+
+import LoginPage from './pages/LoginPage';
+import DashboardPage from './pages/DashboardPage';
+import CustomersPage from './pages/CustomersPage';
+import CustomerDetailPage from './pages/CustomerDetailPage';
+import ProductsPage from './pages/ProductsPage';
+import ChallansPage from './pages/ChallansPage';
+import ChallanDetailPage from './pages/ChallanDetailPage';
 
 function App() {
-  const [status, setStatus] = useState<string>('Checking backend connection...');
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    client.get('/health')
-      .then((res) => {
-        setStatus(`Backend status: ${res.data.status}`);
-      })
-      .catch((err) => {
-        setError(err.message || 'Failed to connect to backend');
-        setStatus('');
-      });
-  }, []);
-
   return (
-    <div style={{ padding: '20px', fontFamily: 'sans-serif' }}>
-      <h1>Mini ERP + CRM</h1>
-      {error ? (
-        <p style={{ color: 'red' }}>Error: {error}</p>
-      ) : (
-        <p>{status}</p>
-      )}
-    </div>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="customers" element={<CustomersPage />} />
+            <Route path="customers/:id" element={<CustomerDetailPage />} />
+            <Route path="products" element={<ProductsPage />} />
+            <Route path="challans" element={<ChallansPage />} />
+            <Route path="challans/:id" element={<ChallanDetailPage />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
 
