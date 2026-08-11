@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../config/prisma';
@@ -6,7 +6,7 @@ import { authenticate } from '../middleware/auth.middleware';
 
 const router = Router();
 
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, password } = req.body;
 
@@ -48,7 +48,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-router.get('/me', authenticate, (req, res) => {
+router.get('/me', authenticate, (req: Request, res: Response): void => {
   res.status(200).json({ user: req.user });
 });
 

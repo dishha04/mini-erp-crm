@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../config/prisma';
 import { authenticate, authorize } from '../middleware/auth.middleware';
@@ -6,15 +6,15 @@ import { authenticate, authorize } from '../middleware/auth.middleware';
 const router = Router();
 
 // Zod schemas
+const CUSTOMER_TYPES = ['RETAIL', 'WHOLESALE', 'DISTRIBUTOR'] as const;
+
 const createCustomerSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   mobile: z.string().min(1, 'Mobile is required'),
   email: z.string().email().optional().or(z.literal('')),
   businessName: z.string().optional(),
   gstNumber: z.string().optional(),
-  customerType: z.enum(['RETAIL', 'WHOLESALE', 'DISTRIBUTOR'], {
-    errorMap: () => ({ message: 'customerType must be RETAIL, WHOLESALE, or DISTRIBUTOR' })
-  }),
+  customerType: z.enum(CUSTOMER_TYPES),
   address: z.string().optional(),
   status: z.enum(['LEAD', 'ACTIVE', 'INACTIVE']).optional(),
   notes: z.string().optional(),
@@ -29,7 +29,7 @@ const readRoles = ['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'] as const;
 const writeRoles = ['ADMIN', 'SALES'] as const;
 
 // GET /customers
-router.get('/', authenticate, authorize(...readRoles), async (req, res) => {
+router.get('/', authenticate, authorize(...readRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -73,10 +73,10 @@ router.get('/', authenticate, authorize(...readRoles), async (req, res) => {
 });
 
 // GET /customers/:id
-router.get('/:id', authenticate, authorize(...readRoles), async (req, res) => {
+router.get('/:id', authenticate, authorize(...readRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const customer = await prisma.customer.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
     });
     if (!customer) {
       res.status(404).json({ error: 'Customer not found' });
@@ -90,11 +90,11 @@ router.get('/:id', authenticate, authorize(...readRoles), async (req, res) => {
 });
 
 // POST /customers
-router.post('/', authenticate, authorize(...writeRoles), async (req, res) => {
+router.post('/', authenticate, authorize(...writeRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const validatedData = createCustomerSchema.safeParse(req.body);
     if (!validatedData.success) {
-      res.status(400).json({ error: 'Validation failed', details: validatedData.error.errors });
+      res.status(400).json({ error: 'Validation failed', details: validatedData.error.issues });
       return;
     }
 
@@ -109,16 +109,16 @@ router.post('/', authenticate, authorize(...writeRoles), async (req, res) => {
 });
 
 // PUT /customers/:id
-router.put('/:id', authenticate, authorize(...writeRoles), async (req, res) => {
+router.put('/:id', authenticate, authorize(...writeRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const validatedData = updateCustomerSchema.safeParse(req.body);
     if (!validatedData.success) {
-      res.status(400).json({ error: 'Validation failed', details: validatedData.error.errors });
+      res.status(400).json({ error: 'Validation failed', details: validatedData.error.issues });
       return;
     }
 
     // Check if exists
-    const existing = await prisma.customer.findUnique({ where: { id: req.params.id } });
+    const existing = await prisma.customer.findUnique({ where: { id: req.params.id as string } });
     if (!existing) {
       res.status(404).json({ error: 'Customer not found' });
       return;
@@ -130,7 +130,7 @@ router.put('/:id', authenticate, authorize(...writeRoles), async (req, res) => {
     }
 
     const customer = await prisma.customer.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: updateData,
     });
     res.json(customer);

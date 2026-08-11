@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import authRoutes from './routes/auth.routes';
 import customerRoutes from './routes/customer.routes';
@@ -23,7 +23,7 @@ app.use('/customers', customerRoutes);
 app.use('/products', productRoutes);
 app.use('/challans', challanRoutes);
 
-app.get('/health', (req, res) => {
+app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'ok' });
 });
 

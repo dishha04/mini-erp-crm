@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../config/prisma';
 import { authenticate, authorize } from '../middleware/auth.middleware';
@@ -25,11 +25,11 @@ async function generateChallanNumber() {
 }
 
 // POST /challans
-router.post('/', authenticate, authorize(...writeRoles), async (req, res) => {
+router.post('/', authenticate, authorize(...writeRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const validatedData = createChallanSchema.safeParse(req.body);
     if (!validatedData.success) {
-      res.status(400).json({ error: 'Validation failed', details: validatedData.error.errors });
+      res.status(400).json({ error: 'Validation failed', details: validatedData.error.issues });
       return;
     }
 
@@ -89,7 +89,7 @@ router.post('/', authenticate, authorize(...writeRoles), async (req, res) => {
 });
 
 // GET /challans
-router.get('/', authenticate, authorize(...readRoles), async (req, res) => {
+router.get('/', authenticate, authorize(...readRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -129,10 +129,10 @@ router.get('/', authenticate, authorize(...readRoles), async (req, res) => {
 });
 
 // GET /challans/:id
-router.get('/:id', authenticate, authorize(...readRoles), async (req, res) => {
+router.get('/:id', authenticate, authorize(...readRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const challan = await prisma.challan.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: {
         customer: true,
         challanItems: true,
@@ -153,10 +153,10 @@ router.get('/:id', authenticate, authorize(...readRoles), async (req, res) => {
 });
 
 // PUT /challans/:id/confirm
-router.put('/:id/confirm', authenticate, authorize(...writeRoles), async (req, res) => {
+router.put('/:id/confirm', authenticate, authorize(...writeRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const challan = await prisma.challan.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: { challanItems: true }
     });
 
@@ -233,10 +233,10 @@ router.put('/:id/confirm', authenticate, authorize(...writeRoles), async (req, r
 });
 
 // PUT /challans/:id/cancel
-router.put('/:id/cancel', authenticate, authorize(...writeRoles), async (req, res) => {
+router.put('/:id/cancel', authenticate, authorize(...writeRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const challan = await prisma.challan.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: { challanItems: true }
     });
 

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, Request, Response } from 'express';
 import { z } from 'zod';
 import prisma from '../config/prisma';
 import { authenticate, authorize } from '../middleware/auth.middleware';
@@ -36,7 +36,7 @@ const readRoles = ['ADMIN', 'SALES', 'WAREHOUSE', 'ACCOUNTS'] as const;
 const writeRoles = ['ADMIN', 'WAREHOUSE'] as const;
 
 // GET /products
-router.get('/', authenticate, authorize(...readRoles), async (req, res) => {
+router.get('/', authenticate, authorize(...readRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -90,10 +90,10 @@ router.get('/', authenticate, authorize(...readRoles), async (req, res) => {
 });
 
 // GET /products/:id
-router.get('/:id', authenticate, authorize(...readRoles), async (req, res) => {
+router.get('/:id', authenticate, authorize(...readRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const product = await prisma.product.findUnique({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       include: {
         stockMovements: {
           orderBy: { createdAt: 'desc' },
@@ -114,11 +114,11 @@ router.get('/:id', authenticate, authorize(...readRoles), async (req, res) => {
 });
 
 // POST /products
-router.post('/', authenticate, authorize(...writeRoles), async (req, res) => {
+router.post('/', authenticate, authorize(...writeRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const validatedData = createProductSchema.safeParse(req.body);
     if (!validatedData.success) {
-      res.status(400).json({ error: 'Validation failed', details: validatedData.error.errors });
+      res.status(400).json({ error: 'Validation failed', details: validatedData.error.issues });
       return;
     }
 
@@ -137,22 +137,22 @@ router.post('/', authenticate, authorize(...writeRoles), async (req, res) => {
 });
 
 // PUT /products/:id
-router.put('/:id', authenticate, authorize(...writeRoles), async (req, res) => {
+router.put('/:id', authenticate, authorize(...writeRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const validatedData = updateProductSchema.safeParse(req.body);
     if (!validatedData.success) {
-      res.status(400).json({ error: 'Validation failed', details: validatedData.error.errors });
+      res.status(400).json({ error: 'Validation failed', details: validatedData.error.issues });
       return;
     }
 
-    const existing = await prisma.product.findUnique({ where: { id: req.params.id } });
+    const existing = await prisma.product.findUnique({ where: { id: req.params.id as string } });
     if (!existing) {
       res.status(404).json({ error: 'Product not found' });
       return;
     }
 
     const product = await prisma.product.update({
-      where: { id: req.params.id },
+      where: { id: req.params.id as string },
       data: validatedData.data,
     });
     res.json(product);
@@ -167,18 +167,18 @@ router.put('/:id', authenticate, authorize(...writeRoles), async (req, res) => {
 });
 
 // POST /products/:id/stock-movement
-router.post('/:id/stock-movement', authenticate, authorize(...writeRoles), async (req, res) => {
+router.post('/:id/stock-movement', authenticate, authorize(...writeRoles), async (req: Request, res: Response): Promise<void> => {
   try {
     const validatedData = stockMovementSchema.safeParse(req.body);
     if (!validatedData.success) {
-      res.status(400).json({ error: 'Validation failed', details: validatedData.error.errors });
+      res.status(400).json({ error: 'Validation failed', details: validatedData.error.issues });
       return;
     }
 
     const { quantity, movementType, reason } = validatedData.data;
 
     const result = await prisma.$transaction(async (tx) => {
-      const product = await tx.product.findUnique({ where: { id: req.params.id } });
+      const product = await tx.product.findUnique({ where: { id: req.params.id as string } });
       if (!product) {
         throw new Error('PRODUCT_NOT_FOUND');
       }
