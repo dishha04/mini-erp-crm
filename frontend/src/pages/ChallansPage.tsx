@@ -69,43 +69,52 @@ export default function ChallansPage() {
 
   return (
     <div>
-      <h2>Sales Challans</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div className="flex justify-between items-center mb-3">
+        <h2>Sales Challans</h2>
+      </div>
+      {error && <div className="mb-2" style={{ color: 'var(--color-danger)', background: '#fee2e2', padding: '0.75rem', borderRadius: '4px' }}>{error}</div>}
 
-      <form onSubmit={handleCreate} style={{ marginBottom: '2rem', padding: '1rem', border: '1px solid #ccc' }}>
-        <h3>Create Draft Challan</h3>
-        <div style={{ marginBottom: '1rem' }}>
-          <select value={customerId} onChange={e => setCustomerId(e.target.value)} required>
-            <option value="">-- Select Customer --</option>
-            {customers.map((c: any) => (
-              <option key={c.id} value={c.id}>{c.name}</option>
-            ))}
-          </select>
-        </div>
-        
-        {items.map((item, idx) => (
-          <div key={idx} style={{ marginBottom: '0.5rem' }}>
-            <select value={item.productId} onChange={e => handleItemChange(idx, 'productId', e.target.value)} required>
-              <option value="">-- Select Product --</option>
-              {products.map((p: any) => (
-                <option key={p.id} value={p.id}>{p.name} (Stock: {p.currentStock})</option>
+      <div className="card">
+        <form onSubmit={handleCreate}>
+          <h3 className="mb-2">Create Draft Challan</h3>
+          <div className="form-group mb-2">
+            <select value={customerId} onChange={e => setCustomerId(e.target.value)} required>
+              <option value="">-- Select Customer --</option>
+              {customers.map((c: any) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
               ))}
             </select>
-            <input type="number" min="1" value={item.quantity} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} required style={{ width: '60px', marginLeft: '10px' }} />
           </div>
-        ))}
-        <button type="button" onClick={handleAddLine} style={{ marginRight: '10px' }}>+ Add Item</button>
-        <button type="submit">Create Challan</button>
-      </form>
+          
+          {items.map((item, idx) => (
+            <div key={idx} className="form-row mb-1">
+              <select value={item.productId} onChange={e => handleItemChange(idx, 'productId', e.target.value)} required style={{ flex: 1 }}>
+                <option value="">-- Select Product --</option>
+                {products.map((p: any) => (
+                  <option key={p.id} value={p.id}>{p.name} (Stock: {p.currentStock})</option>
+                ))}
+              </select>
+              <input type="number" min="1" value={item.quantity} onChange={e => handleItemChange(idx, 'quantity', e.target.value)} required style={{ width: '100px' }} />
+            </div>
+          ))}
+          <div className="flex gap-2 mt-2" style={{ marginTop: 'var(--space-md)' }}>
+            <button type="button" className="secondary" onClick={handleAddLine}>+ Add Item</button>
+            <button type="submit" className="primary">Create Challan</button>
+          </div>
+        </form>
+      </div>
 
-      <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)} style={{ marginBottom: '1rem' }}>
-        <option value="">All Statuses</option>
-        <option value="DRAFT">DRAFT</option>
-        <option value="CONFIRMED">CONFIRMED</option>
-        <option value="CANCELLED">CANCELLED</option>
-      </select>
+      <div className="card">
+        <div className="mb-3" style={{ maxWidth: '300px' }}>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="">All Statuses</option>
+            <option value="DRAFT">DRAFT</option>
+            <option value="CONFIRMED">CONFIRMED</option>
+            <option value="CANCELLED">CANCELLED</option>
+          </select>
+        </div>
 
-      <table border={1} cellPadding={5} style={{ borderCollapse: 'collapse', width: '100%' }}>
+      <table>
         <thead>
           <tr>
             <th>Challan No</th>
@@ -122,15 +131,20 @@ export default function ChallansPage() {
               <td>{c.challanNumber}</td>
               <td>{c.customer?.name}</td>
               <td>{c.totalQuantity}</td>
-              <td>{c.status}</td>
+              <td>
+                <span className={`badge ${c.status === 'CONFIRMED' ? 'green' : c.status === 'CANCELLED' ? 'red' : 'gray'}`}>
+                  {c.status}
+                </span>
+              </td>
               <td>{new Date(c.createdAt).toLocaleDateString()}</td>
               <td>
-                <Link to={`/challans/${c.id}`}>View / Manage</Link>
+                <Link to={`/challans/${c.id}`} style={{ fontWeight: 500 }}>View / Manage</Link>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

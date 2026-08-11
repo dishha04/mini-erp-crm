@@ -13,18 +13,20 @@ export default function Layout() {
 
   return (
     <div>
-      <nav style={{ display: 'flex', gap: '1rem', padding: '1rem', background: '#eee', alignItems: 'center' }}>
+      <nav className="navbar">
         <strong>Mini ERP</strong>
-        <Link to="/dashboard">Dashboard</Link>
-        <Link to="/customers">Customers</Link>
-        <Link to="/products">Products</Link>
-        <Link to="/challans">Challans</Link>
-        <div style={{ marginLeft: 'auto' }}>
-          <span style={{ marginRight: '1rem' }}>{user?.name || user?.userId} ({user?.role})</span>
-          <button onClick={handleLogout}>Logout</button>
+        <div className="nav-links">
+          <Link to="/dashboard" className="nav-link">Dashboard</Link>
+          <Link to="/customers" className="nav-link">Customers</Link>
+          <Link to="/products" className="nav-link">Products</Link>
+          <Link to="/challans" className="nav-link">Challans</Link>
+        </div>
+        <div className="flex items-center gap-2">
+          <span style={{ marginRight: '1rem' }}>{user?.name || user?.userId} <span className="badge gray">{user?.role}</span></span>
+          <button className="secondary" onClick={handleLogout}>Logout</button>
         </div>
       </nav>
-      <main style={{ padding: '2rem' }}>
+      <main className="container">
         <Outlet />
       </main>
     </div>

@@ -69,23 +69,50 @@ export default function ProductsPage() {
 
   return (
     <div>
-      <h2>Products & Inventory</h2>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div className="flex justify-between items-center mb-3">
+        <h2>Products & Inventory</h2>
+      </div>
+      {error && <div className="mb-2" style={{ color: 'var(--color-danger)', background: '#fee2e2', padding: '0.75rem', borderRadius: '4px' }}>{error}</div>}
 
-      <form onSubmit={handleAddProduct} style={{ marginBottom: '2rem', padding: '1rem', border: '1px solid #ccc' }}>
-        <h3>Add Product</h3>
-        <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
-        <input placeholder="SKU" value={sku} onChange={e => setSku(e.target.value)} required />
-        <input placeholder="Category" value={category} onChange={e => setCategory(e.target.value)} />
-        <input type="number" step="0.01" placeholder="Unit Price" value={unitPrice} onChange={e => setUnitPrice(e.target.value)} required />
-        <input type="number" placeholder="Min Stock Alert" value={minStockAlert} onChange={e => setMinStockAlert(e.target.value)} />
-        <input placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} />
-        <button type="submit">Add</button>
-      </form>
+      <div className="card">
+        <form onSubmit={handleAddProduct} className="form-row" style={{ flexWrap: 'wrap' }}>
+          <h3 style={{ width: '100%', marginBottom: 'var(--space-sm)' }}>Add Product</h3>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label>Name</label>
+            <input placeholder="Name" value={name} onChange={e => setName(e.target.value)} required />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label>SKU</label>
+            <input placeholder="SKU" value={sku} onChange={e => setSku(e.target.value)} required />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label>Category</label>
+            <input placeholder="Category" value={category} onChange={e => setCategory(e.target.value)} />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 150px' }}>
+            <label>Unit Price</label>
+            <input type="number" step="0.01" placeholder="Unit Price" value={unitPrice} onChange={e => setUnitPrice(e.target.value)} required />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 150px' }}>
+            <label>Min Stock Alert</label>
+            <input type="number" placeholder="Min Stock Alert" value={minStockAlert} onChange={e => setMinStockAlert(e.target.value)} />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 200px' }}>
+            <label>Location</label>
+            <input placeholder="Location" value={location} onChange={e => setLocation(e.target.value)} />
+          </div>
+          <div className="form-group" style={{ flex: '1 1 100%', alignItems: 'flex-start' }}>
+            <button type="submit" className="primary">Add Product</button>
+          </div>
+        </form>
+      </div>
 
-      <input type="text" placeholder="Search..." value={search} onChange={e => setSearch(e.target.value)} style={{ marginBottom: '1rem' }} />
+      <div className="card">
+        <div className="mb-3" style={{ maxWidth: '300px' }}>
+          <input type="text" placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
+        </div>
 
-      <table border={1} cellPadding={5} style={{ borderCollapse: 'collapse', width: '100%' }}>
+      <table>
         <thead>
           <tr>
             <th>Name</th>
@@ -101,28 +128,32 @@ export default function ProductsPage() {
           {products.map((p: any) => {
             const isLowStock = p.currentStock <= p.minStockAlert;
             return (
-              <tr key={p.id} style={{ backgroundColor: isLowStock ? '#ffcccc' : 'transparent' }}>
+              <tr key={p.id} style={{ backgroundColor: isLowStock ? '#fee2e2' : 'transparent' }}>
                 <td>{p.name}</td>
                 <td>{p.sku}</td>
                 <td>{p.category}</td>
                 <td>{p.unitPrice}</td>
-                <td>{p.currentStock}</td>
+                <td>
+                  <span className={`badge ${isLowStock ? 'red' : 'green'}`}>
+                    {p.currentStock}
+                  </span>
+                </td>
                 <td>{p.minStockAlert}</td>
                 <td>
                   {movementProductId === p.id ? (
-                    <form onSubmit={(e) => handleStockMovement(e, p.id)}>
-                      {movementError && <p style={{ color: 'red', fontSize: '12px' }}>{movementError}</p>}
-                      <select value={movementType} onChange={e => setMovementType(e.target.value)}>
+                    <form onSubmit={(e) => handleStockMovement(e, p.id)} style={{ flexDirection: 'row', alignItems: 'center', gap: '0.5rem' }}>
+                      {movementError && <span style={{ color: 'var(--color-danger)', fontSize: '12px' }}>{movementError}</span>}
+                      <select value={movementType} onChange={e => setMovementType(e.target.value)} style={{ width: '80px', padding: '0.25rem' }}>
                         <option value="IN">IN</option>
                         <option value="OUT">OUT</option>
                       </select>
-                      <input type="number" placeholder="Qty" value={movementQty} onChange={e => setMovementQty(e.target.value)} required min="1" style={{ width: '60px' }} />
-                      <input placeholder="Reason" value={movementReason} onChange={e => setMovementReason(e.target.value)} />
-                      <button type="submit">Save</button>
-                      <button type="button" onClick={() => { setMovementProductId(null); setMovementError(''); }}>Cancel</button>
+                      <input type="number" placeholder="Qty" value={movementQty} onChange={e => setMovementQty(e.target.value)} required min="1" style={{ width: '70px', padding: '0.25rem' }} />
+                      <input placeholder="Reason" value={movementReason} onChange={e => setMovementReason(e.target.value)} style={{ width: '150px', padding: '0.25rem' }} />
+                      <button type="submit" className="primary" style={{ padding: '0.25rem 0.5rem' }}>Save</button>
+                      <button type="button" className="secondary" style={{ padding: '0.25rem 0.5rem' }} onClick={() => { setMovementProductId(null); setMovementError(''); }}>Cancel</button>
                     </form>
                   ) : (
-                    <button onClick={() => { 
+                    <button className="secondary" onClick={() => { 
                       setMovementProductId(p.id); 
                       setMovementQty(''); 
                       setMovementReason(''); 
@@ -136,6 +167,7 @@ export default function ProductsPage() {
           })}
         </tbody>
       </table>
+      </div>
     </div>
   );
 }

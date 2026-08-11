@@ -46,48 +46,66 @@ export default function ChallanDetailPage() {
 
   return (
     <div>
-      <h2>Challan: {challan.challanNumber}</h2>
-      {actionError && <div style={{ color: 'red', padding: '1rem', border: '1px solid red', marginBottom: '1rem' }}>{actionError}</div>}
+      <div className="flex justify-between items-center mb-3">
+        <h2>Challan: {challan.challanNumber}</h2>
+        <span className={`badge ${challan.status === 'CONFIRMED' ? 'green' : challan.status === 'CANCELLED' ? 'red' : 'gray'}`}>
+          {challan.status}
+        </span>
+      </div>
       
-      <div style={{ marginBottom: '2rem' }}>
-        <p><strong>Status:</strong> {challan.status}</p>
-        <p><strong>Customer:</strong> {challan.customer?.name}</p>
-        <p><strong>Created By:</strong> {challan.createdBy?.name || challan.createdBy?.email}</p>
-        <p><strong>Date:</strong> {new Date(challan.createdAt).toLocaleString()}</p>
+      {actionError && <div className="mb-2" style={{ color: 'var(--color-danger)', background: '#fee2e2', padding: '0.75rem', borderRadius: '4px' }}>{actionError}</div>}
+      
+      <div className="card">
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+          <div>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Customer</p>
+            <p style={{ fontWeight: 500 }}>{challan.customer?.name}</p>
+          </div>
+          <div>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Created By</p>
+            <p>{challan.createdBy?.name || challan.createdBy?.email}</p>
+          </div>
+          <div>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Date</p>
+            <p>{new Date(challan.createdAt).toLocaleString()}</p>
+          </div>
+        </div>
         
-        <div style={{ marginTop: '1rem' }}>
+        <div className="flex gap-2" style={{ marginTop: 'var(--space-lg)', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--color-border)' }}>
           {challan.status === 'DRAFT' && (
-            <button onClick={handleConfirm} style={{ marginRight: '10px', background: 'green', color: 'white' }}>Confirm Challan (Deduct Stock)</button>
+            <button className="primary" onClick={handleConfirm}>Confirm Challan (Deduct Stock)</button>
           )}
           {challan.status !== 'CANCELLED' && (
-            <button onClick={handleCancel} style={{ background: 'red', color: 'white' }}>Cancel Challan</button>
+            <button className="danger" onClick={handleCancel}>Cancel Challan</button>
           )}
         </div>
       </div>
 
-      <h3>Line Items</h3>
-      <table border={1} cellPadding={5} style={{ borderCollapse: 'collapse', width: '100%' }}>
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>SKU</th>
-            <th>Unit Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {challan.challanItems?.map((item: any) => (
-            <tr key={item.id}>
-              <td>{item.productNameSnapshot}</td>
-              <td>{item.productSkuSnapshot}</td>
-              <td>{item.unitPriceSnapshot}</td>
-              <td>{item.quantity}</td>
-              <td>{(parseFloat(item.unitPriceSnapshot) * item.quantity).toFixed(2)}</td>
+      <div className="card">
+        <h3 className="mb-3">Line Items</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Product Name</th>
+              <th>SKU</th>
+              <th>Unit Price</th>
+              <th>Quantity</th>
+              <th>Total</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {challan.challanItems?.map((item: any) => (
+              <tr key={item.id}>
+                <td>{item.productNameSnapshot}</td>
+                <td>{item.productSkuSnapshot}</td>
+                <td>{item.unitPriceSnapshot}</td>
+                <td>{item.quantity}</td>
+                <td style={{ fontWeight: 500 }}>{(parseFloat(item.unitPriceSnapshot) * item.quantity).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
