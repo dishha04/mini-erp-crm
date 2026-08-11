@@ -8,7 +8,13 @@ import challanRoutes from './routes/challan.routes';
 const app = express();
 
 // Middleware
-app.use(cors());
+const allowedOrigins = process.env.FRONTEND_URL 
+  ? process.env.FRONTEND_URL.split(',').map(url => url.trim()) 
+  : '*';
+
+app.use(cors({
+  origin: allowedOrigins
+}));
 app.use(express.json());
 
 // Routes
