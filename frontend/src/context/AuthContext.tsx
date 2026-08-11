@@ -1,5 +1,4 @@
-import { createContext, useState, useEffect, ReactNode } from 'react';
-import client from '../api/client';
+import { createContext, useState, useEffect, type ReactNode } from 'react';
 
 export interface User {
   userId: string;
