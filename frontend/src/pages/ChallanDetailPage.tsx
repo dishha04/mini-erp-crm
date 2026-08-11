@@ -62,12 +62,21 @@ export default function ChallanDetailPage() {
             <p style={{ fontWeight: 500 }}>{challan.customer?.name}</p>
           </div>
           <div>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Total Quantity</p>
+            <p>{challan.totalQuantity}</p>
+          </div>
+          <div>
             <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Created By</p>
-            <p>{challan.createdBy?.name || challan.createdBy?.email}</p>
+            <p>{challan.createdBy?.name || challan.createdBy?.email || challan.createdById}</p>
           </div>
           <div>
             <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>Date</p>
-            <p>{new Date(challan.createdAt).toLocaleString()}</p>
+            <p>
+              {new Date(challan.createdAt).toLocaleString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric',
+                hour: 'numeric', minute: '2-digit', hour12: true
+              })}
+            </p>
           </div>
         </div>
         

@@ -12,6 +12,7 @@ export default function ChallansPage() {
   const [products, setProducts] = useState([]);
   const [customerId, setCustomerId] = useState('');
   const [items, setItems] = useState<{productId: string, quantity: number}[]>([]);
+  const [isConfirming, setIsConfirming] = useState(false);
 
   const fetchChallans = async () => {
     try {
@@ -58,10 +59,25 @@ export default function ChallansPage() {
     e.preventDefault();
     if (items.length === 0) return alert('Add at least one item');
     try {
-      await client.post('/challans', { customerId, items });
+      const res = await client.post('/challans', { customerId, items });
+      const newChallanId = res.data.id || res.data.data?.id; // handling both response shapes just in case
+      
+      let confirmError = '';
+      if (isConfirming && newChallanId) {
+        try {
+          await client.put(`/challans/${newChallanId}/confirm`);
+        } catch (confirmErr: any) {
+          confirmError = confirmErr.response?.data?.error || 'Failed to confirm challan';
+        }
+      }
+
       setCustomerId('');
       setItems([]);
       fetchChallans();
+
+      if (confirmError) {
+        alert(`Saved as draft, but could not confirm: ${confirmError}`);
+      }
     } catch (err: any) {
       alert(err.response?.data?.error || 'Failed to create challan');
     }
@@ -98,8 +114,9 @@ export default function ChallansPage() {
             </div>
           ))}
           <div className="flex gap-2 mt-2" style={{ marginTop: 'var(--space-md)' }}>
-            <button type="button" className="secondary" onClick={handleAddLine}>+ Add Item</button>
-            <button type="submit" className="primary">Create Challan</button>
+            <button type="button" className="secondary" onClick={handleAddLine} style={{ marginRight: 'auto' }}>+ Add Item</button>
+            <button type="submit" className="secondary" onClick={() => setIsConfirming(false)}>Save as Draft</button>
+            <button type="submit" className="primary" onClick={() => setIsConfirming(true)}>Save & Confirm</button>
           </div>
         </form>
       </div>
@@ -136,7 +153,12 @@ export default function ChallansPage() {
                   {c.status}
                 </span>
               </td>
-              <td>{new Date(c.createdAt).toLocaleDateString()}</td>
+              <td>
+                {new Date(c.createdAt).toLocaleString('en-US', {
+                  month: 'short', day: 'numeric', year: 'numeric',
+                  hour: 'numeric', minute: '2-digit', hour12: true
+                })}
+              </td>
               <td>
                 <Link to={`/challans/${c.id}`} style={{ fontWeight: 500 }}>View / Manage</Link>
               </td>
