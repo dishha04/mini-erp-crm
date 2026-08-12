@@ -50,6 +50,16 @@ export default function LoginPage() {
           </div>
           <button type="submit" className="primary" style={{ marginTop: '0.5rem' }}>Sign In</button>
         </form>
+        <hr style={{ margin: '1.5rem 0 1rem 0', border: 'none', borderTop: '1px solid var(--color-border)' }} />
+        <div style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+          <strong style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--color-text-main)' }}>Test Credentials</strong>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+            <div><strong>Admin:</strong> admin@erp.test / Admin@123</div>
+            <div><strong>Sales:</strong> sales@erp.test / Sales@123</div>
+            <div><strong>Warehouse:</strong> warehouse@erp.test / Warehouse@123</div>
+            <div><strong>Accounts:</strong> accounts@erp.test / Accounts@123</div>
+          </div>
+        </div>
       </div>
     </div>
   );
